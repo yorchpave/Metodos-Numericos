@@ -40,7 +40,7 @@ void solveBySecante(double a, double b, double en){
         }
         else{
 
-            solveBySecante(a, c, en); //acotamiento por la izqiuerda
+            solveBySecante(a, c, en); //acotamiento por la izquierda
             solveBySecante(c, b, en); //acotamiento por la derecha
         }
     }
