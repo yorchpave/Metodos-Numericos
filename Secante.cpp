@@ -1,49 +1,56 @@
 //Metodo Secante
 
-#include <iostream>
+#include <cstdio>
 #include <cmath>
-#include <string>
 
-using namespace std;
+#ifndef MINERR
+#define MINERR 1E-15
+#endif
 
+typedef double (* vFunctionCall)(double x);
 
-void solveBySecante(double a, double b, double en);
-double xm(double a, double b);
+double secante(vFunctionCall fun, double x1, double x2) {
+  double x0;
+  int i = 0;
+  do {
+    x0=x1;
+    x1=x2;
+    x2 = x1 - (x1-x0) * fun(x1) / (fun(x1) - fun(x0));
+    i++;
+  } while ( fabs (x1-x2) > MINERR );
 
-int main(){
-    double a, b, en;
-    a = 1;
-    b = 2;
-
-    en = 0.01;
-    solveBySecante(a, b, en);
-    return 0;
+  fprintf(stderr, "Iteraciones: %d\n", i);
+  fprintf(stderr, "Error: %f\n", fabs(x1 - x2));
+  return x2;
 }
 
-
-void solveBySecante(double a, double b, double en){
-
-    //funcion = 2*sin(x)-x
-
-    double c, fc, fa, fb, cOld, enCurrent;
-    fa = 2. * sin(a) - a;
-    fb = 2. * sin(b) - b;
-    c = a - ((fa * (b - a)) / (fb - fa));
-
-    if (fa * fb < 0){
-        cOld = c;
-        fc = 2. * sin(c) - c;
-        enCurrent = fabs((c - cOld)/c)*1.;
-
-        if (fc < en && fc > -en && enCurrent <= en) {
-            cout << c << " es la raiz con un error normalizado de "<< en <<" % usando el metodo Secante" << endl;
-        }
-        else{
-
-            solveBySecante(a, c, en); //acotamiento por la izquierda
-            solveBySecante(c, b, en); //acotamiento por la derecha
-        }
-    }
-
+double f1(double x) {
+  return pow(x, 2) - 4;
 }
 
+double f2(double x) {
+  return exp(x) - x;
+}
+
+double f3(double x) {
+  return pow(x, 1 / 3.0);
+}
+
+double f4(double x) {
+  return pow(x, 3) - x - 11;
+}
+
+double f5(double x){
+  return pow(x, 2);
+}
+
+int main(int argc, char const *argv[]) {
+  fprintf(stderr, "%f\n", secante(f1, 4, 3));
+  fprintf(stderr, "%f\n", secante(f2, -1, 1));
+  fprintf(stderr, "%f\n", secante(f3, 1, 0));
+  fprintf(stderr, "%f\n", secante(f4, -10, 5));
+  fprintf(stderr, "%f\n", secante(f3, -20, 20));
+  fprintf(stderr, "%f\n", secante(f5, -1, 1));
+
+  return 0;
+}
