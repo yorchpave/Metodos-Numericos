@@ -24,7 +24,7 @@ int main(){
 }
 
 void solveBySecante(double a, double b, double en){
-    //escribe funcion aqui
+    //Escribe funcion
     //funcion = 2*sin(x)-x
     
     double c, fc, fa, fb, cOld, enCurrent;
@@ -35,6 +35,7 @@ void solveBySecante(double a, double b, double en){
     if (fa * fb < 0){
         cOld = c;
         fc = 2. * sin(c) - c;
+        //Escoge tipo de error
         //enCurrent = fabs((c - cOld)/c)*1.; // <- porcentual 
         //enCurrent = fabs((c - cOld));  // <-absoluto  (real - obtenido)
         //enCurrent = fabs((c - cOld)/c); //<- relativo (real - obtenido/ real) 
