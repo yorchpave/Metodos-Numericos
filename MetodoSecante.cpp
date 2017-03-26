@@ -13,11 +13,11 @@ int iter = 0;
 int main(){
     double a, b, en;
     
-    //intervalos
+    //Define intervalos
     a = 1;
     b = 3;
     
-    //error
+    //Define error
     en = 0.001;
     solveBySecante(a, b, en);
     return 0;
