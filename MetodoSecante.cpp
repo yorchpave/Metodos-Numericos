@@ -13,27 +13,29 @@ int iter = 0;
 int main(){
     double a, b, en;
     
-    //Define intervalos
+    //---------Define intervalos-----------
     a = 1;
     b = 3;
     
-    //Define error
+    //-----Define error--------
     en = 0.001;
     solveBySecante(a, b, en);
     return 0;
 }
 
 void solveBySecante(double a, double b, double en){
-    //Escribe funcion
-    //funcion = 2*sin(x)-x
+    //---------------funcion = 2*sin(x)-x----------------
     
     double c, fc, fa, fb, cOld, enCurrent;
+    //---------funcion en a--------------------
     fa = 2. * sin(a) - a;
+    //---------------funcion en b------------- 
     fb = 2. * sin(b) - b;
     c = a - ((fa * (b - a)) / (fb - fa));
     
     if (fa * fb < 0){
         cOld = c;
+        //----------funcion en c -------------------
         fc = 2. * sin(c) - c;
         //Escoge tipo de error
         //enCurrent = fabs((c - cOld)/c)*1.; // <- porcentual 
