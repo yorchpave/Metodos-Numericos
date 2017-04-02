@@ -1,89 +1,248 @@
+// Regresión lineal
+
 #include <iostream>
-#include <fstream>
 #include <cmath>
-#include <sstream>
+#include <fstream>
+#include <string>
+
 
 using namespace std;
 
-double *linear_regression(double *xs, double *ys, unsigned size) {
-  double s_x, s_y, s_x2, s_p;
+// Lista de las variables que se usarán.
+double sum, sumx, sumx2, sumy, sumxy, promx, promy, a0, a1, sr, st, desvest, s, r, alfa, beta;
 
-  for (size_t i = 0; i < size; i++) {
-    s_x += xs[i];
-    s_y += ys[i];
-    s_x2 += xs[i] * xs[i];
-    s_p += xs[i] * ys[i];
-  }
-
-  double mu_x = s_x / size;
-  double mu_y = s_y / size;
-
-  double a1 = (size * s_p - s_x * s_y) / (size * s_x2 - s_x * s_x);
-  double a0 = (mu_y - a1 * mu_x);
-
-  // correlation coeficient
-  double st, sr;
-  for (unsigned i = 0; i < size; i++) {
-    sr += pow(ys[i] - a0 - a1 * xs[i], 2);
-    st += pow(ys[i] - mu_y, 2);
-  }
-
-  // standard error
-  double std_err = sqrt(sr / (size - 2));
-  std::cout << "Standard error: " << std_err << '\n';
-
-  // Determination coefficient
-  double r2 = (st - sr) / st;
-  std::cout << "Determination coefficient: " << r2 << '\n';
-  std::cout << "Correlation coefficient: " << sqrt(r2) << '\n';
-
-  printf("Equation: Y_guess = %f + %f * X\n", a0, a1);
-  cout << "a1: " << a1 << "\t" << "a0: " << a0 << endl;
-
-  return new double[2] {a0, a1};
+// Método que hace una sumatoria.
+double sumatoria(double valores[], int modo, int n) {
+    sum = 0;
+    // Sumatoria normal de los valores del arreglo.
+    if (modo == 0) {
+        for (int i = 0; i < n; i++) {
+            sum += valores[i];
+        }
+    }
+    // Sumatoria de los cuadrados de los valores del arreglo.
+    else if (modo == 1) {
+        for (int i = 0; i < n; i++) {
+            sum += pow(valores[i], 2);
+        }
+    }
+    return sum;
 }
 
-int main(int argc, char const *argv[]) {
-  if (argc < 4) {
-    std::cerr << "Invalid number of arguments" << '\n';
-    return -1;
-  }
+// Método que efectúa la sumatoria de los productos de los valores
+// de ambos arreglos.
+double sumatoriaMult(double x[], double y[], int n) {
+    sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += (x[i]*y[i]);
+    }
+    return sum;
+}
 
-  ifstream x_stream(argv[1], ios::in);
-  ifstream y_stream(argv[2], ios::in);
+//
+double getSt(double y[], double promy, int n) {
+    sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += pow((y[i] - promy),2);
+    }
+    return sum;
+}
 
-  istringstream ss(argv[3]);
-  int size;
-  if (!(ss >> size)) {
-    std::cerr << "Invalid number " << argv[3] << '\n';
-  }
+double getSr(double x[], double y[], double a0, double a1, int n) {
+    sum = 0;
+    for (int i = 0; i < n; i++) {
+        sum += pow((y[i] - a0 - a1*x[i]), 2);
+    }
+    return sum;
+}
 
-  if (!x_stream.is_open() | !y_stream.is_open()) {
-    cerr << "Unable to open file\n";
-    return -1;
-  }
+// Método de regresión lineal. Recibe dos arreglos que
+// representan los valores de x y y, el número de
+// datos.
+void regresionLineal(double x[], double y[], int n) {
 
-  double *X = new double[size];
-  double *Y = new double[size];
+    // Se sacan los valores necesarios para la fórmula de
+    // la regresión lineal.
+    sumx = sumatoria(x, 0, n);
+    sumy = sumatoria(y, 0, n);
+    sumx2 = sumatoria(x, 1, n);
+    sumxy = sumatoriaMult(x, y, n);
+    promx = sumx / n;
+    promy = sumy / n;
 
-  // Read files
-  cout << "--- Big Data ---" << '\n';
-  cout << "  X\t|  Y" << '\n';
-  cout << "----------------" << '\n';
-  for (int i = 0; x_stream && y_stream && i < size; i++) {
-    double x, y;
-    x_stream >> x;
-    y_stream >> y;
+    // Se aplican las fórmulas de a1 y a0 con los datos
+    // obtenidos previamente.
+    a1 = ((n*sumxy) - (sumx*sumy)) / ((n*sumx2) - pow(sumx, 2));
+    a0 = promy - a1*promx;
 
-    X[i] = x;
-    Y[i] = y;
+    // Imprime la ecuación de la recta ajustada.
+    cout << "La recta es: y = " << a0 << " + " << a1 << "x" << endl;
 
-    cout << x << "\t" << y << endl;
-  }
-  x_stream.close();
-  y_stream.close();
+    // Obtiene sr y st para la cuantificación del error.
+    sr = getSr(x, y, a0, a1, n);
+    st = getSt(y, promy, n);
 
-  linear_regression(X, Y, size);
+    // Obtiene la desviación estándar y el error estándar de la
+    // estimación.
+    desvest = sqrt(st / (n - 1));
+    s = sqrt(sr / (n - 2));
 
-  return 0;
+    // Determina si la desviación mejoro, y por tanto el ajuste
+    // fue bueno.
+    cout << "Desviacion estandar: " << desvest << endl;
+    cout << "Error estandar de la estimacion: " << s << endl;
+    if (desvest > s) {
+        cout << "El ajuste fue adecuado." << endl;
+    }
+    else {
+        cout << "No hubo un ajuste relevante." << endl;
+    }
+
+    // Obtiene el coeficiente de determinación y el coeficiente
+    // de correlación.
+    r = (st - sr) / st;
+    cout << "Coeficiente de determinacion: " << r << endl;
+    cout << "Coeficiente de correlacion: " << sqrt(r) << endl;
+
+
+}
+
+void linealizacion(double x[], double y[], int n, int modo) {
+
+    double *logx = new double[n];
+    double *logy = new double[n];
+
+    if (modo == 0) {
+        for (int i = 0; i < n; i++) {
+            logy[i] = log(y[i]);
+        }
+
+        beta = (logy[1] - logy[0]) / (x[1] - x[0]);
+        alfa = beta*(-x[0]) + logy[0];
+
+        cout << "La linealizacion es: ln(y) = " << alfa << " + " << beta << "x" << endl;
+        cout << "La curva ajustada es: y = " << exp(alfa) << "e ^ " << beta << "x" << endl;
+
+        // Se sacan los valores necesarios para la fórmula de
+        // la regresión lineal.
+        sumx = sumatoria(x, 0, n);
+        sumy = sumatoria(logy, 0, n);
+        sumx2 = sumatoria(x, 1, n);
+        sumxy = sumatoriaMult(x, logy, n);
+        promx = sumx / n;
+        promy = sumy / n;
+
+        // Se aplican las fórmulas de a1 y a0 con los datos
+        // obtenidos previamente.
+        a1 = ((n*sumxy) - (sumx*sumy)) / ((n*sumx2) - pow(sumx, 2));
+        a0 = promy - a1*promx;
+
+        // Obtiene sr y st para la cuantificación del error.
+        sr = getSr(x, logy, a0, a1, n);
+        st = getSt(logy, promy, n);
+
+        // Obtiene la desviación estándar y el error estándar de la
+        // estimación.
+        desvest = sqrt(st / (n - 1));
+        s = sqrt(sr / (n - 2));
+
+        // Determina si la desviación mejoro, y por tanto el ajuste
+        // fue bueno.
+        cout << "Desviacion estandar: " << desvest << endl;
+        cout << "Error estandar de la estimacion: " << s << endl;
+        if (desvest > s) {
+            cout << "El ajuste fue adecuado." << endl;
+        }
+        else {
+            cout << "No hubo un ajuste relevante." << endl;
+        }
+
+        // Obtiene el coeficiente de determinación y el coeficiente
+        // de correlación.
+        r = (st - sr) / st;
+        cout << "Coeficiente de determinacion: " << r << endl;
+        cout << "Coeficiente de correlacion: " << sqrt(r) << endl;
+
+
+
+    }else if (modo == 1){
+        for (int i = 0; i < n; i++) {
+            logx[i] = log10(x[i]);
+            logy[i] = log10(y[i]);
+        }
+        beta = (logy[1] - logy[0]) / (logx[1] - logx[0]);
+        alfa = beta*(-logx[0]) + logy[0];
+
+        cout << "La linealizacion es: log(y) = " << beta << "log(x) + " << alfa << endl;
+        cout << "La curva ajustada es: y = " << pow(10, alfa) << "x ^ " << beta << endl;
+
+        // Se sacan los valores necesarios para la fórmula de
+        // la regresión lineal.
+        sumx = sumatoria(logx, 0, n);
+        sumy = sumatoria(logy, 0, n);
+        sumx2 = sumatoria(logx, 1, n);
+        sumxy = sumatoriaMult(logx, logy, n);
+        promx = sumx / n;
+        promy = sumy / n;
+
+        // Se aplican las fórmulas de a1 y a0 con los datos
+        // obtenidos previamente.
+        a1 = ((n*sumxy) - (sumx*sumy)) / ((n*sumx2) - pow(sumx, 2));
+        a0 = promy - a1*promx;
+
+        // Obtiene sr y st para la cuantificación del error.
+        sr = getSr(logx, logy, a0, a1, n);
+        st = getSt(logy, promy, n);
+
+        // Obtiene la desviación estándar y el error estándar de la
+        // estimación.
+        desvest = sqrt(st / (n - 1));
+        s = sqrt(sr / (n - 2));
+
+
+        // Determina si la desviación mejoro, y por tanto el ajuste
+        // fue bueno.
+        cout << "Desviacion estandar: " << desvest << endl;
+        cout << "Error estandar de la estimacion: " << s << endl;
+        if (desvest > s) {
+            cout << "El ajuste fue adecuado." << endl;
+        }
+        else {
+            cout << "No hubo un ajuste relevante." << endl;
+        }
+
+        // Obtiene el coeficiente de determinación y el coeficiente
+        // de correlación.
+        r = (st - sr) / st;
+        cout << "Coeficiente de determinacion: " << r << endl;
+        cout << "Coeficiente de correlacion: " << sqrt(r) << endl;
+
+    }
+}
+
+int main() {
+    // Arreglos de valores de x y y.
+
+    double x[] = { 1,2,3,4,5,6,7 };
+    double y[] = { 0.5, 2.5, 2, 4, 3.5, 6, 5.5 };
+
+    //double x2[] = {0.75, 2, 3, 4, 6, 8, 8.5};
+    //double y2[] = {1.2, 1.95, 2, 2.4, 2.4, 2.7, 2.6};
+
+    // Llamada al método.
+    regresionLineal(x, y, (sizeof(x)/sizeof(x[0])));//------------REGRESION LINEAL---------
+
+    //cout << endl
+
+    //double x2[] = { 1,2,3,4,5 };
+    //double y2[] = { 0.5, 1.7, 3.4, 5.7, 8.4 };
+
+   // double x2[] = { 2.5, 3.5, 5, 6, 7.5, 10, 12.5, 15, 17.5, 20 };
+    //double y2[] = { 13, 11, 8.5, 8.2, 7, 6.2, 5.2, 4.8, 4.6, 4.3 };
+
+    //double x2[] = { 0.4, 0.8, 1.2, 1.6, 2, 2.3 };
+    //double y2[] = { 800, 975, 1500, 1950, 2900, 3600 };
+    //linealizacion(x2, y2, (sizeof(x2) / sizeof(x2[0])), 0);//--------LINEALIZACION-----------POTENCIAL(1) Y EXPONENCIAL(0)--------------
+
+    return 0;
 }
