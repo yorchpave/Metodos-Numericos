@@ -81,7 +81,7 @@ int main(){
     int size;
     int solutions[] = {7,6,12};
 
-    int n, l;
+    int n = 3;
 
     float x [n];
     cout<<"Enter the value of n : " << endl;
