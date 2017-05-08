@@ -42,9 +42,9 @@ void Newton(double x[], double y[], int tamano, double valor) {
 
 int main() {
 
-	double x[] = {0, 8, 16, 24, 32, 40}; //-----------puntos en x
-	double y[] = {14.621, 11.843, 9.870, 8.418, 7.305, 6.413}; //----------puntos en y
+	double x[] = {/*introduce aqui puntos en x*/}; //-----------puntos en x
+	double y[] = {/*introduce aqui puntos en y*/}; //----------puntos en y
 
-	Newton(x, y, sizeof(x)/sizeof(x[0]), 27); //------valor de x a usar
+	Newton(x, y, sizeof(x)/sizeof(x[0]), /*x*/); //------valor de x a usar
 
 }
