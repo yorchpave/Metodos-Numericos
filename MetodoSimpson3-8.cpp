@@ -36,29 +36,10 @@ int main()
     cout<<"\nLa integral definida es "<<integral<<"\n"<<endl;
     return 0;
 }
-
 /*
-//para 1/3, los puntos deben ser impares. Osea segmentos (n) pares
-//para 3/8, siempre deben de ser 4 puntos. Osea 3 segmentos (n)
-//puntos = segmentos + 1
-//segmentos = puntos - 1
-//rango entre valores de x se saca con (b - a) / n
-//a y b son limites de integral
-//sacas y evaluando x en funcion a resolver 
-
-
-
-
-si son 3 segmentos y 4 puntos, solo usas 1 vez 3/8
-si son 2 segmentos y 3 puntos, solo usas 1 vez 1/3
-si es 1 segmento y 2 puntos, trapecio, etc usas otra cosa
-
-si son 4 segmentos y 5 puntos, solo usas 1 vez 1/3
-
-si son 5 segmentos y 6 puntos, usas 4 puntos con 3/8 y los otros 3 puntos (1 se comparte) con 1/3
-
-SIEMPRE QUE LOS SEGMENTOS SEAN PARES, USAS 1/3
-
-si son 7 segmentos, 8 puntos, usas 3/8 dos veces
-
+para 1/3, los puntos deben ser impares. Osea segmentos (n) pares
+para 3/8, siempre deben de ser 4 puntos. Osea 3 segmentos (n)
+puntos = segmentos + 1
+segmentos = puntos - 1
+rango entre valores de x se saca con (b - a) / n
 */
